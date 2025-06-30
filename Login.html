@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Here</title>
+
+    <!-- Including AOS Library -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.1/aos.js"></script>
+
+    <!-- Google Font - Source Sans 3 for whole document -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Font Awesome -->
+    <script
+      src="https://kit.fontawesome.com/3d18c06321.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <!-- Favicon -->
+    <link
+      rel="shortcut icon"
+      href="./images/ThreadNeedle.png"
+      type="image/x-icon"
+    />
+
+    <!-- My CSS -->
+    <link rel="stylesheet" href="./Login.css" />
+  </head>
+  <body>
+    <div class="form-container" data-aos="zoom-in" data-aos-duration="9000">
+      <h2 data-aos="fade-down" data-aos-duration="1000">Login now</h2>
+      <form onsubmit="event.preventDefault(); loginUser();">
+        <div class="input-group" data-aos="fade-right" data-aos-duration="1000">
+          <label for="UserID">User ID</label>
+          <input type="UserID" id="UserID" placeholder="UserID" required />
+        </div>
+
+        <div class="input-group" data-aos="fade-left" data-aos-duration="1000">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Password"
+            required
+          />
+        </div>
+        <div id="lastbutton">
+          <button onclick="redirectToLogin()">Login</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Including External JS for Login logic -->
+    <script src="Login.js"></script>
+
+    <script>
+      AOS.init({
+        duration: 1200, // Animation duration (in milliseconds)
+      });
+    </script>
+  </body>
+</html>

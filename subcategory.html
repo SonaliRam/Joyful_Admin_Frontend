@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Subcategory Dashboard</title>
+    <link rel="stylesheet" href="global.css" />
+    <link rel="stylesheet" href="subcategory.css" />
+    <link rel="stylesheet" href="category.css" />
+    <style>
+      .grid-table {
+        display: grid;
+        grid-template-columns: 20% 20% 20% 15% 25%;
+        text-align: center;
+        padding: 1rem;
+        font-weight: bold;
+        background: #f3f4f6;
+        border-bottom: 2px solid #e5e7eb;
+      }
+
+      #subcategoryTableBody .grid-row {
+        display: grid;
+        grid-template-columns: 20% 20% 20% 15% 25%;
+        padding: 1rem;
+        align-items: center;
+        border-bottom: 1px solid #e5e7eb;
+        transition: background-color 0.2s;
+      }
+
+      #subcategoryTableBody .grid-row:hover {
+        background-color: #f9fafb;
+      }
+
+      .image-container {
+        width: 80px;
+        height: 60px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid #ccc;
+        background-color: #f8f8f8;
+      }
+
+      .image-container img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+
+      .status-badge {
+        display: inline-block;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .status-badge.published {
+        background-color: #d1fae5;
+        color: #065f46;
+      }
+
+      .status-badge.draft {
+        background-color: #fee2e2;
+        color: #991b1b;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+      }
+
+      .action-buttons button {
+        padding: 0.4rem 0.8rem;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: 0.2s;
+      }
+
+      .edit-btn {
+        background-color: #047857;
+        color: white;
+      }
+      .delete-btn {
+        background-color: #dc2626;
+        color: white;
+      }
+
+      .edit-btn:hover {
+        background-color: #059669;
+      }
+      .delete-btn:hover {
+        background-color: #b91c1c;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="Dashboard.html" class="logo">AdminPanel</a>
+        <ul class="nav-menu">
+          <li class="nav-item">
+            <a href="Category.html">Category</a>
+          </li>
+          <li class="nav-item">
+            <a href="subcategory.html">Sub-Category</a>
+          </li>
+          <li class="nav-item">
+            <a href="product.html"> Products</a>
+          </li>
+          <li class="nav-item">
+            <a href="productenquiry.html">Product Enquiry</a>
+          </li>
+
+          <li class="nav-item">
+            <button class="logout" onclick="logout()">Logout</button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="top-bar container">
+      <h1 class="headings">Subcategory Dashboard</h1>
+      <div class="top-controls">
+        <button class="add-btn" onclick="openAddModal()">
+          + Add Subcategory
+        </button>
+        <div id="subcategoryCount" class="category-count">
+          Total Subcategories: 0
+        </div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <div class="table-wrapper">
+        <div class="table-header grid-table">
+          <div>Name</div>
+          <div>Image</div>
+          <div>Category</div>
+          <div>Status</div>
+          <div>Actions</div>
+        </div>
+        <div id="subcategoryTableBody"></div>
+      </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="addModal" class="modal" style="display: none">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="headings" id="formTitle">Add Subcategory</h2>
+          <span class="close-btn" onclick="closeAddModal()">&times;</span>
+        </div>
+        <form id="addForm" class="modal-form">
+          <input type="hidden" id="subcategoryId" />
+
+          <div class="form-group">
+            <label><span class="required">*</span> Name:</label>
+            <input type="text" id="name" required />
+          </div>
+
+          <div class="form-group">
+            <label><span class="required">*</span> Description:</label>
+            <div
+              contenteditable="true"
+              id="description"
+              class="contenteditable-field"
+              placeholder="Subcategory description"
+              style="border: 1px solid #ccc; padding: 5px; min-height: 100px"
+              required
+            ></div>
+          </div>
+
+          <div class="form-group">
+            <label><span class="required">*</span> Image Path (URL):</label>
+            <input
+              type="text"
+              id="imagepath"
+              placeholder="Paste image URL"
+              oninput="previewSubcategoryImage()"
+              required
+            />
+            <img
+              id="subImagePreview"
+              src=""
+              alt="Preview"
+              class="image-preview"
+              style="display: none"
+            />
+          </div>
+
+          <div class="form-group">
+            <label><span class="required">*</span> Meta Title:</label>
+            <input type="text" id="metatitle" required />
+          </div>
+
+          <div class="form-group">
+            <label><span class="required">*</span> Meta Description:</label>
+            <textarea id="metadescription" required></textarea>
+          </div>
+
+          <div class="form-group">
+            <label><span class="required">*</span> SEO Keywords:</label>
+            <input type="text" id="seokeywords" required />
+          </div>
+
+          <div class="form-group">
+            <label><span class="required">*</span> Publish Status:</label>
+            <label>
+              <input
+                type="radio"
+                name="ispublished"
+                value="true"
+                checked
+                required
+              />
+              Publish
+            </label>
+            <label>
+              <input type="radio" name="ispublished" value="false" required />
+              Draft
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label><span class="required">*</span> Select Categories:</label>
+            <div
+              class="custom-multi-select"
+              onclick="toggleDropdown()"
+              style="position: relative"
+            >
+              <div
+                id="selectedCategories"
+                class="selected-tags"
+                style="
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 5px;
+                  min-height: 38px;
+                  border: 1px solid #ccc;
+                  padding: 5px;
+                  cursor: text;
+                "
+              ></div>
+              <div
+                id="dropdownList"
+                class="dropdown-list"
+                style="
+                  display: none;
+                  position: absolute;
+                  top: 100%;
+                  left: 0;
+                  width: 100%;
+                  background: white;
+                  border: 1px solid #ccc;
+                  z-index: 10;
+                "
+              ></div>
+            </div>
+          </div>
+
+          <div class="form-buttons">
+            <button type="submit" class="btn-primary">Save</button>
+            <button
+              type="button"
+              class="btn-secondary"
+              onclick="closeAddModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script src="./Logout.js"></script>
+
+    <script src="./subcategory.js"></script>
+  </body>
+</html>
