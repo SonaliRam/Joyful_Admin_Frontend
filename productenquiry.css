@@ -30,7 +30,7 @@
 }
 
 .table-wrapper {
-  width: 100%;
+  width: 95%;
   max-width: 1400px;
   background-color: var(--secondary-bg);
   border-radius: var(--border-radius);

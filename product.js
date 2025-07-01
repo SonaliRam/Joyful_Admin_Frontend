@@ -172,12 +172,13 @@ function resetSubcategorySelector() {
 async function handleAddProductSubmit(e) {
   e.preventDefault();
 
-  const variants = Array.from(
-    document.querySelectorAll("#variantsContainer .variantRow")
-  ).map((row) => {
-    const select = row.querySelector("select").value;
-    const values = row.querySelector("input").value;
-    return { optionName: select, optionValues: values };
+  const variantsMap = {};
+  document.querySelectorAll("#variantsContainer .variantRow").forEach((row) => {
+    const key = row.querySelector("select").value;
+    const value = row.querySelector("input").value;
+    if (key && value) {
+      variantsMap[key] = value;
+    }
   });
 
   const colorImages = Object.fromEntries(
@@ -210,7 +211,8 @@ async function handleAddProductSubmit(e) {
       console.log("📤 Submitting ispublished (raw radio):", value); // ✅
       return value === "true";
     })(),
-    variation: variants.length > 0 ? "true" : "false",
+    variation: Object.keys(variantsMap).length > 0 ? "true" : "false",
+    variantsMap: variantsMap, // ✅ now added correctly
     colorimages: colorImages,
     subcategories: selectedSubcategoryIds.map((id) => ({ id })),
   };
@@ -279,6 +281,9 @@ async function loadProducts() {
 
       tbody.appendChild(tr);
     });
+    document.getElementById(
+      "productCount"
+    ).textContent = `Total Products: ${data.length}`;
   } catch (err) {
     console.error("Error loading products:", err);
   }
@@ -288,10 +293,11 @@ async function editProduct(id) {
   try {
     const res = await fetch(`${baseUrl}/${id}`);
     if (!res.ok) throw new Error("Failed to fetch product");
-    
+
     const product = await res.json();
-    console.log("🛠 Edit mode: ispublished from backend →", product.ispublished); // ✅
-    
+    console.log("🛠 Edit mode: ispublished from backend →", product.ispublished);
+
+    // Fill simple input fields
     document.getElementById("productName").value = product.name;
     document.getElementById("productSize").value = product.size;
     document.getElementById("mainImage").value =
@@ -299,45 +305,51 @@ async function editProduct(id) {
     previewMainImage();
     document.getElementById("productFilter").value = product.filter || "";
     document.getElementById("productTags").value =
-    product.producttags?.join(", ") || "";
+      product.producttags?.join(", ") || "";
     document.getElementById("metaTitle").value = product.metatitle;
     document.getElementById("metaDescription").value = product.metadescription;
     document.getElementById("pageKeywords").value = product.pagekeywords;
-    
+
+    // Set isPublished radio
     document.querySelector(
       `input[name="ispublished"][value="${product.ispublished}"]`
     ).checked = true;
-    
+
+    // Quill description
     quill.root.innerHTML = product.description || "";
+
+    // Subcategories
     resetSubcategorySelector();
     product.subcategories?.forEach((sub) =>
       selectSubcategory(sub.id, sub.name)
-  );
-  
-  document.getElementById("variantsContainer").innerHTML = "";
-  if (product.variation === "true" && product.variants) {
-    product.variants.forEach((variant) => {
-      const div = document.createElement("div");
-      div.classList.add("variantRow");
-      div.innerHTML = `
+    );
+
+    // Variants
+    document.getElementById("variantsContainer").innerHTML = "";
+    if (product.variation === "true" && product.variantsMap) {
+      for (const [key, value] of Object.entries(product.variantsMap)) {
+        const div = document.createElement("div");
+        div.classList.add("variantRow");
+        div.innerHTML = `
           <select required>
-          <option value="">Select Option Name</option>
-          <option value="Color" ${
-            variant.optionName === "Color" ? "selected" : ""
+            <option value="">Select Option Name</option>
+            <option value="Color" ${
+              key === "Color" ? "selected" : ""
             }>Color</option>
             <option value="Size" ${
-              variant.optionName === "Size" ? "selected" : ""
+              key === "Size" ? "selected" : ""
             }>Size</option>
             <option value="Material" ${
-              variant.optionName === "Material" ? "selected" : ""
+              key === "Material" ? "selected" : ""
             }>Material</option>
-            </select>
-            <input type="text" value="${variant.optionValues}" required />
-            `;
-            document.getElementById("variantsContainer").appendChild(div);
-          });
-        }
-        
+          </select>
+          <input type="text" value="${value}" required />
+        `;
+        document.getElementById("variantsContainer").appendChild(div);
+      }
+    }
+
+    // Color Images
     document.getElementById("colorImageContainer").innerHTML = "";
     if (product.colorimages) {
       document.getElementById("colorImageContainer").style.display = "block";
@@ -360,10 +372,11 @@ async function editProduct(id) {
         });
       });
     }
-    
+
+    // Set product ID to enable update mode
     document
-    .getElementById("addProductForm")
-    .setAttribute("data-id", product.id);
+      .getElementById("addProductForm")
+      .setAttribute("data-id", product.id);
     openAddProductModal();
   } catch (err) {
     console.error("Error editing product:", err);
