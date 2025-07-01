@@ -15,7 +15,9 @@
   --danger-color: #ef4444;
   --warning-color: #f59e0b;
 }
-
+a{
+  text-decoration: none;
+}
 * {
   margin: 0;
   padding: 0;
