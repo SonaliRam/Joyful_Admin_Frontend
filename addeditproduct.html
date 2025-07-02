@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="Dashboard.css" />
     <link rel="stylesheet" href="global.css" />
     <link rel="stylesheet" href="product.css" />
-    <link rel="stylesheet" href="addeditproduct.css">
+    <link rel="stylesheet" href="addeditproduct.css" />
     <link
       href="https://cdn.jsdelivr.net/npm/quill@1.3.7/dist/quill.snow.css"
       rel="stylesheet"
@@ -39,7 +39,10 @@
     </div>
 
     <!-- 🧾 FORM CONTENT -->
-    <div class="container" style="max-width: 900px; margin: auto; border:1px solid #ccc">
+    <div
+      class="container"
+      style="max-width: 900px; margin: auto; border: 1px solid #ccc"
+    >
       <form id="addProductForm" class="modal-form">
         <div class="form-group">
           <label><span class="required">*</span> Name:</label>
@@ -50,113 +53,7 @@
             required
           />
         </div>
-
         <div class="form-group">
-          <label><span class="required">*</span> Description:</label>
-          <div id="productDescriptionEditor" style="height: 150px"></div>
-        </div>
-
-        <div class="form-group inline-sm">
-          <label><span class="required">*</span> Size:</label>
-          <input
-            type="text"
-            id="productSize"
-            placeholder="Product Size"
-            required
-          />
-        </div>
-
-        <div class="form-group inline-sm">
-          <label><span class="required">*</span> Main Image URL:</label>
-          <input
-            type="url"
-            id="mainImage"
-            placeholder="Paste image URL"
-            required
-            oninput="previewMainImage()"
-          />
-          <img
-            id="mainImagePreview"
-            style="
-              width: 50%;
-                max-height: 200px;
-                margin: 10px 0;
-                display: none;
-                text-align: center;
-                border: 1px solid lightblue;
-            "
-          />
-        </div>
-
-        <div class="form-group inline-sm">
-          <label><span class="required">*</span> Filter:</label>
-          <input
-            type="text"
-            id="productFilter"
-            placeholder="Product Filter"
-            required
-          />
-        </div>
-
-        <div class="form-group inline-sm">
-          <label><span class="required">*</span> Product Tags:</label>
-          <input
-            type="text"
-            id="productTags"
-            placeholder="Comma-separated tags (eco-friendly, new)"
-            required
-          />
-        </div>
-
-        <div class="form-group inline-sm">
-          <label><span class="required">*</span> Meta Title:</label>
-          <input type="text" id="metaTitle" placeholder="Meta Title" required />
-        </div>
-
-        <div class="form-group inline-sm">
-          <label><span class="required">*</span> Meta Description:</label>
-          <textarea
-            id="metaDescription"
-            placeholder="Meta Description"
-            required
-          ></textarea>
-        </div>
-
-        <div class="form-group inline-sm">
-          <label><span class="required">*</span> Page Keywords:</label>
-          <input
-            type="text"
-            id="pageKeywords"
-            placeholder="Keywords for SEO"
-            required
-          />
-        </div>
-
-        <div class="form-group inline-sm">
-          <label><span class="required">*</span> Variants:</label>
-          <div id="variantsContainer"></div>
-          <button type="button" class="btn-secondary Variant" onclick="addVariantRow()">
-            + Add Variant
-          </button>
-        </div>
-
-        <div class="form-group inline-sm">
-          <label><span class="required">*</span> Select Sub-Image With Their Colors:</label>
-          <div
-            id="colorImageContainer"
-            style="display: none; margin-top: 10px "
-          ></div>
-          <button
-            type="button"
-            class="btn-secondary"
-            onclick="toggleColorImageSection()"
-            style="width: 44%;"
-          >
-            + Add Color Image
-          </button>
-        </div>
-
-        <div class="form-group inline-sm">
           <label><span class="required">*</span> Select Subcategories:</label>
           <div
             class="subcategory-multi-select"
@@ -191,6 +88,127 @@
               "
             ></div>
           </div>
+        </div>
+        <div class="form-group">
+          <label><span class="required">*</span> Description:</label>
+          <div id="productDescriptionEditor" style="height: 150px"></div>
+        </div>
+
+        <div class="form-group inline-sm">
+          <label><span class="required">*</span> Size:</label>
+          <input
+            type="text"
+            id="productSize"
+            placeholder="Product Size"
+            required
+          />
+        </div>
+
+        <div class="form-group inline-sm">
+          <label><span class="required">*</span> Main Image URL:</label>
+          <input
+            type="url"
+            id="mainImage"
+            placeholder="Paste image URL"
+            required
+            oninput="previewMainImage()"
+          />
+          <img
+            id="mainImagePreview"
+            style="
+              width: 50%;
+              max-height: 200px;
+              margin: 10px 0;
+              display: none;
+              text-align: center;
+              border: 1px solid lightblue;
+            "
+          />
+        </div>
+
+        <div class="form-group inline-sm">
+          <label><span class="required">*</span> Filter:</label>
+          <input
+            type="text"
+            id="productFilter"
+            placeholder="Product Filter"
+            required
+          />
+        </div>
+
+        <div class="form-group inline-sm">
+          <label><span class="required">*</span> Product Tags:</label>
+          <input
+            type="text"
+            id="productTags"
+            placeholder="Comma-separated tags (eco-friendly, new)"
+            required
+          />
+        </div>
+        <div style="margin-bottom: 10px">
+          <h3
+            style="
+              border-bottom: 1px solid rgb(58, 141, 248);
+              width: 45px;
+              color: rgb(58, 141, 248);
+            "
+          >
+            SEO:
+          </h3>
+        </div>
+        <div class="form-group ">
+          <label><span class="required">*</span>SEO Meta Title:</label>
+          <input type="text" id="metaTitle" placeholder="Meta Title" required />
+        </div>
+
+        <div class="form-group inline-sm">
+          <label><span class="required">*</span>SEO Meta Description:</label>
+          <textarea
+            id="metaDescription"
+            placeholder="Meta Description"
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-group inline-sm">
+          <label><span class="required">*</span> Page Keywords:</label>
+          <input
+            type="text"
+            id="pageKeywords"
+            placeholder="Keywords for SEO"
+            required
+          />
+        </div>
+
+        <div class="form-group inline-sm">
+          <label><span class="required">*</span> Variants:</label>
+          <div id="variantsContainer"></div>
+          <button
+            type="button"
+            class="btn-secondary Variant"
+            onclick="addVariantRow()"
+          >
+            + Add Variant
+          </button>
+        </div>
+
+        <div class="form-group inline-sm">
+          <label
+            ><span class="required">*</span> Select Sub-Image With Their
+            Colors:</label
+          >
+          <div
+            id="colorImageContainer"
+            style="display: none; margin-top: 10px"
+          ></div>
+          <button
+            type="button"
+            class="btn-secondary"
+            onclick="toggleColorImageSection()"
+            style="width: 44%"
+          >
+            + Add Color Image
+          </button>
         </div>
 
         <div class="form-group">
