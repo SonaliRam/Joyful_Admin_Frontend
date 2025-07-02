@@ -8,7 +8,7 @@ let quill;
 window.onload = () => {
   loadSubcategories();
   document.addEventListener("click", handleOutsideClick);
-  document.getElementById("openAddProductModal").onclick = openAddProductModal;
+  // document.getElementById("openAddProductModal").onclick = openAddProductModal;
   document
     .getElementById("addProductForm")
     .addEventListener("submit", handleAddProductSubmit);
@@ -154,6 +154,8 @@ function selectSubcategory(id, name) {
     <span style="margin-left: 6px; cursor: pointer;" onclick="removeSubcategory(${id})">❌</span>
   `;
   document.getElementById("selectedSubcategories").appendChild(tag);
+  document.querySelector(".subcategory-multi-select").style.border =
+    "1px solid #ccc";
 }
 
 function removeSubcategory(id) {
@@ -167,11 +169,18 @@ function removeSubcategory(id) {
 function resetSubcategorySelector() {
   selectedSubcategoryIds = [];
   document.getElementById("selectedSubcategories").innerHTML = "";
+  document.querySelector(".subcategory-multi-select").style.border =
+    "1px solid #ccc";
 }
 
 async function handleAddProductSubmit(e) {
   e.preventDefault();
-
+  if (selectedSubcategoryIds.length === 0) {
+    alert("Please select at least one subcategory.");
+    document.querySelector(".subcategory-multi-select").style.border =
+      "1px solid red";
+    return;
+  }
   const variantsMap = {};
   document.querySelectorAll("#variantsContainer .variantRow").forEach((row) => {
     const key = row.querySelector("select").value;

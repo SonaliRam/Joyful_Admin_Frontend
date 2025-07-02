@@ -68,7 +68,8 @@ function addColorImageRow() {
   const container = document.getElementById("colorImageContainer");
   const row = document.createElement("div");
   row.className = "colorImageRow";
-  row.style.cssText = "display: flex; align-items: center; gap: 10px; margin-bottom: 10px;";
+  row.style.cssText =
+    "display: flex; align-items: center; gap: 10px; margin-bottom: 10px;";
 
   const colorInputId = `colorInput-${Date.now()}`;
 
@@ -100,7 +101,6 @@ function addColorImageRow() {
     colorCode.textContent = colorInput.value;
   });
 }
-  
 
 function toggleSubcategoryDropdown() {
   const dropdown = document.getElementById("subcategoryDropdownList");
@@ -143,6 +143,7 @@ function selectSubcategory(id, name) {
     "background: #e0e0e0; padding: 4px 8px; margin: 2px; border-radius: 5px; display: flex; align-items: center;";
   tag.innerHTML = `${name}<span style="margin-left: 6px; cursor: pointer;" onclick="removeSubcategory(${id})">❌</span>`;
   document.getElementById("selectedSubcategories").appendChild(tag);
+  document.querySelector(".subcategory-multi-select").style.border = ""; // clear red border on valid selection
 }
 
 function removeSubcategory(id) {
@@ -160,6 +161,12 @@ function resetSubcategorySelector() {
 
 async function handleAddProductSubmit(e) {
   e.preventDefault();
+  if (selectedSubcategoryIds.length === 0) {
+    const selectBox = document.querySelector(".subcategory-multi-select");
+    selectBox.style.border = "2px solid red";
+    alert("Please select at least one subcategory.");
+    return;
+  }
 
   const variantsMap = {};
   document.querySelectorAll("#variantsContainer .variantRow").forEach((row) => {
