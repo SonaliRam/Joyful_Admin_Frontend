@@ -159,14 +159,15 @@
             />
           </div>
           <div class="form-group">
-            <label
-              ><input type="radio" name="publishStatus" value="true" checked />
-              Publish</label
-            >
-            <label
-              ><input type="radio" name="publishStatus" value="false" /> Save as
-              Draft</label
-            >
+            <label>Status:</label>
+            <div class="radio-group">
+              <label>
+                Publish
+                <input type="radio" name="publishStatus" value="true" checked />
+                Draft
+                <input type="radio" name="publishStatus" value="false" />
+              </label>
+            </div>
           </div>
           <div class="form-buttons">
             <button type="submit" class="btn-primary">Save</button>
@@ -261,7 +262,7 @@
                   value="PUBLISHED"
                   checked
                 />
-                Save as Draft
+                Draft
                 <input type="radio" name="editStatus" value="DRAFT" />
               </label>
             </div>
