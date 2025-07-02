@@ -20,13 +20,12 @@ window.onload = async () => {
       ],
     },
   });
+  await loadCategories();
 
   document.addEventListener("click", handleOutsideClick);
   document
     .getElementById("addProductForm")
     .addEventListener("submit", handleAddProductSubmit);
-
-  await loadSubcategories(); // ✅ ensure this loads before edit prefill
 
   const id = new URLSearchParams(window.location.search).get("id");
   if (id) {
@@ -102,7 +101,13 @@ function addColorImageRow() {
   });
 }
 
+
 function toggleSubcategoryDropdown() {
+  if (selectedCategoryIds.length === 0) {
+    document.getElementById("subcategoryWarning").style.display = "block";
+    return;
+  }
+  document.getElementById("subcategoryWarning").style.display = "none";
   const dropdown = document.getElementById("subcategoryDropdownList");
   dropdown.style.display =
     dropdown.style.display === "block" ? "none" : "block";
@@ -115,19 +120,95 @@ function handleOutsideClick(e) {
     dropdown.style.display = "none";
   }
 }
+const categoryUrl = "http://localhost:8080/categories";
+let allCategories = [];
+let selectedCategoryIds = [];
+async function loadCategories() {
+  try {
+    const res = await fetch(categoryUrl);
+    allCategories = await res.json();
+    const dropdownList = document.getElementById("categoryDropdownList");
+    dropdownList.innerHTML = allCategories
+      .map(
+        (cat) => `
+        <div class="dropdown-item" data-id="${cat.id}" onclick="selectCategory(${cat.id}, '${cat.name}')"
+          style="padding: 6px; cursor: pointer; border-bottom: 1px solid #eee;">${cat.name}</div>
+      `
+      )
+      .join("");
+  } catch (err) {
+    console.error("Error loading categories:", err);
+  }
+}
+
+function toggleCategoryDropdown() {
+  const dropdown = document.getElementById("categoryDropdownList");
+  dropdown.style.display =
+    dropdown.style.display === "block" ? "none" : "block";
+}
+
+function selectCategory(id, name) {
+  if (selectedCategoryIds.includes(id)) return;
+  selectedCategoryIds.push(id);
+  const tag = document.createElement("span");
+  tag.classList.add("tag");
+  tag.setAttribute("data-id", id);
+  tag.style.cssText =
+    "background: #e0e0e0; padding: 4px 8px; margin: 2px; border-radius: 5px; display: flex; align-items: center;";
+  tag.innerHTML = `${name}<span style="margin-left: 6px; cursor: pointer;" onclick="removeCategory(${id})">❌</span>`;
+  document.getElementById("selectedCategories").appendChild(tag);
+  document.querySelector(".custom-multi-select").style.border = "";
+  document.getElementById("subcategoryWarning").style.display = "none";
+  loadSubcategories(); // Refresh subcategory list after category update
+}
+
+function removeCategory(id) {
+  selectedCategoryIds = selectedCategoryIds.filter((cid) => cid !== id);
+  const tag = document.querySelector(
+    `#selectedCategories span[data-id="${id}"]`
+  );
+  if (tag) tag.remove();
+  loadSubcategories(); // Refresh subcategory list after category update
+}
+
+function handleOutsideClick(e) {
+  const categoryDropdown = document.getElementById("categoryDropdownList");
+  const subcategoryDropdown = document.getElementById(
+    "subcategoryDropdownList"
+  );
+  const customCategory = document.querySelector(".custom-multi-select");
+  const customSubcategory = document.querySelector(".subcategory-multi-select");
+
+  if (categoryDropdown && !customCategory.contains(e.target)) {
+    categoryDropdown.style.display = "none";
+  }
+  if (subcategoryDropdown && !customSubcategory.contains(e.target)) {
+    subcategoryDropdown.style.display = "none";
+  }
+}
 
 async function loadSubcategories() {
   try {
     const res = await fetch(subcategoryUrl);
     allSubcategories = await res.json();
+
     const dropdownList = document.getElementById("subcategoryDropdownList");
-    dropdownList.innerHTML = allSubcategories
-      .map(
-        (sub) => `
-      <div class="dropdown-item" data-id="${sub.id}" onclick="selectSubcategory(${sub.id}, '${sub.name}')" style="padding: 6px; cursor: pointer; border-bottom: 1px solid #eee;">${sub.name}</div>
-    `
-      )
-      .join("");
+
+    // Filter by selected categories
+    const filteredSubcategories = allSubcategories.filter((sub) =>
+      sub.categories?.some((cat) => selectedCategoryIds.includes(cat.id))
+    );
+
+    dropdownList.innerHTML = filteredSubcategories.length
+      ? filteredSubcategories
+          .map(
+            (sub) => `
+          <div class="dropdown-item" data-id="${sub.id}" onclick="selectSubcategory(${sub.id}, '${sub.name}')"
+            style="padding: 6px; cursor: pointer; border-bottom: 1px solid #eee;">${sub.name}</div>
+        `
+          )
+          .join("")
+      : `<div style="padding: 8px; color: gray;">No subcategories found for selected categories.</div>`;
   } catch (err) {
     console.error("Error loading subcategories:", err);
   }
@@ -158,6 +239,11 @@ function resetSubcategorySelector() {
   selectedSubcategoryIds = [];
   document.getElementById("selectedSubcategories").innerHTML = "";
 }
+function resetCategorySelector() {
+  selectedCategoryIds = [];
+  document.getElementById("selectedCategories").innerHTML = "";
+}
+
 
 async function handleAddProductSubmit(e) {
   e.preventDefault();
@@ -243,10 +329,24 @@ async function loadProductForEdit(id) {
 
     quill.root.innerHTML = product.description || "";
 
+  
     resetSubcategorySelector();
-    product.subcategories?.forEach((sub) =>
-      selectSubcategory(sub.id, sub.name)
-    );
+    resetCategorySelector();
+
+    const seenCategoryIds = new Set(); // Avoid duplicate tags
+
+    product.subcategories?.forEach((sub) => {
+      selectSubcategory(sub.id, sub.name);
+
+      if (Array.isArray(sub.categories)) {
+        sub.categories.forEach((cat) => {
+          if (!seenCategoryIds.has(cat.id)) {
+            seenCategoryIds.add(cat.id);
+            selectCategory(cat.id, cat.name);
+          }
+        });
+      }
+    });
 
     document.getElementById("variantsContainer").innerHTML = "";
     if (product.variation === "true" && product.variantsMap) {
