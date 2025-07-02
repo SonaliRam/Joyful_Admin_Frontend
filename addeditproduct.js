@@ -50,12 +50,13 @@ function addVariantRow() {
       <option value="">Select Option Name</option>
       <option value="Color">Color</option>
       <option value="Size">Size</option>
-      <option value="Material">Material</option>
+      <option value="Capacity">Capacity</option>
     </select>
     <input type="text" placeholder="Enter option values comma-separated" required />
   `;
   container.appendChild(div);
 }
+
 
 function toggleColorImageSection() {
   const container = document.getElementById("colorImageContainer");
@@ -362,9 +363,9 @@ async function loadProductForEdit(id) {
             <option value="Size" ${
               key === "Size" ? "selected" : ""
             }>Size</option>
-            <option value="Material" ${
-              key === "Material" ? "selected" : ""
-            }>Material</option>
+            <option value="Capacity" ${
+              key === "Capacity" ? "selected" : ""
+            }>Capacity</option>
           </select>
           <input type="text" value="${value}" required />
         `;
