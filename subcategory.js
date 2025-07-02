@@ -181,7 +181,6 @@ document
     e.preventDefault();
 
     const id = document.getElementById("subcategoryId").value;
-    // const description = document.getElementById("description").innerHTML.trim();
     const description = descriptionQuill.root.innerHTML.trim();
 
     const subcategory = {
@@ -213,7 +212,6 @@ document
 function editSubcategory(sub) {
   document.getElementById("subcategoryId").value = sub.id;
   document.getElementById("name").value = sub.name;
-  // document.getElementById("description").innerHTML = sub.description || "";
   descriptionQuill.root.innerHTML = sub.description || "";
   descriptionQuill.setContents(
     descriptionQuill.clipboard.convert(sub.description || "")
