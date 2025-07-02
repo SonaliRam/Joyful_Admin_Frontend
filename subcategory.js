@@ -4,12 +4,27 @@ const categoryUrl = "http://localhost:8080/categories";
 const subcategoryMap = new Map(); // Store subcategories
 let allCategories = []; // Store loaded category list
 let selectedCategoryIds = []; // Store selected category IDs
+let descriptionQuill;
 
 window.onload = () => {
   getAllSubcategories();
   loadCategories();
   document.addEventListener("click", handleOutsideClick);
+  descriptionQuill = new Quill("#descriptionEditor", {
+    theme: "snow",
+    placeholder: "Write subcategory description...",
+    modules: {
+      toolbar: [
+        [{ header: [1, 2, false] }],
+        ["bold", "italic", "underline"],
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ align: [] }],
+        ["clean"],
+      ],
+    },
+  });
 };
+
 function previewSubcategoryImage() {
   const imageUrl = document.getElementById("imagepath").value.trim();
   const preview = document.getElementById("subImagePreview");
@@ -150,6 +165,7 @@ function openAddModal() {
   resetCategorySelector();
   document.getElementById("subcategoryId").value = "";
   document.getElementById("formTitle").innerText = "Add Subcategory";
+  descriptionQuill.setContents([]); // clear Quill on open
 }
 
 function closeAddModal() {
@@ -165,7 +181,8 @@ document
     e.preventDefault();
 
     const id = document.getElementById("subcategoryId").value;
-    const description = document.getElementById("description").innerHTML.trim();
+    // const description = document.getElementById("description").innerHTML.trim();
+    const description = descriptionQuill.root.innerHTML.trim();
 
     const subcategory = {
       name: document.getElementById("name").value,
@@ -196,7 +213,12 @@ document
 function editSubcategory(sub) {
   document.getElementById("subcategoryId").value = sub.id;
   document.getElementById("name").value = sub.name;
-  document.getElementById("description").innerHTML = sub.description || "";
+  // document.getElementById("description").innerHTML = sub.description || "";
+  descriptionQuill.root.innerHTML = sub.description || "";
+  descriptionQuill.setContents(
+    descriptionQuill.clipboard.convert(sub.description || "")
+  );
+
   document.getElementById("imagepath").value = sub.imagepath;
   document.getElementById("metatitle").value = sub.metatitle;
   document.getElementById("metadescription").value = sub.metadescription;
