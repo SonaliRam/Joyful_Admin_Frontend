@@ -1,5 +1,7 @@
 const baseUrl = "http://localhost:8080/categories";
 const categoryMap = new Map(); // Stores id -> category object
+let addQuill;
+let editQuill;
 
 function previewImage() {
   const imageUrl = document.getElementById("addImageLink").value;
@@ -8,7 +10,40 @@ function previewImage() {
   preview.src = imageUrl.trim();
 }
 
-window.onload = getAllCategories;
+// window.onload = getAllCategories;
+window.onload = () => {
+  getAllCategories();
+
+  // Initialize Quill for Add Description
+  addQuill = new Quill("#addDescriptionEditor", {
+    theme: "snow",
+    placeholder: "Write category description...",
+    modules: {
+      toolbar: [
+        [{ header: [1, 2, false] }],
+        ["bold", "italic", "underline"],
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ align: [] }],
+        ["clean"],
+      ],
+    },
+  });
+
+  // Initialize Quill for Edit Description
+  editQuill = new Quill("#editDescriptionEditor", {
+    theme: "snow",
+    placeholder: "Edit category description...",
+    modules: {
+      toolbar: [
+        [{ header: [1, 2, false] }],
+        ["bold", "italic", "underline"],
+        [{ list: "ordered" }, { list: "bullet" }],
+        [{ align: [] }],
+        ["clean"],
+      ],
+    },
+  });
+};
 
 // * new
 async function getAllCategories() {
@@ -83,10 +118,11 @@ function openAddModal() {
   document.getElementById("addModal").style.display = "flex";
 }
 
+
 function closeAddModal() {
   document.getElementById("addModal").style.display = "none";
   document.getElementById("addForm").reset();
-  document.getElementById("addDescription").innerHTML = "";
+  addQuill.setContents([]); // clear editor
   document.getElementById("imagePreview").style.display = "none";
 }
 
@@ -119,7 +155,7 @@ function handleEditClick(id) {
 function editCategory(cat) {
   document.getElementById("editId").value = cat.id;
   document.getElementById("editName").value = cat.name;
-  document.getElementById("editDescription").value = cat.description;
+  editQuill.root.innerHTML = cat.description || "";
   document.getElementById("editSearchKeywords").value = cat.searchkeywords;
   document.getElementById("editImageLink").value = cat.imagelink;
   document.getElementById("editSeoTitle").value = cat.seotitle;
@@ -141,7 +177,8 @@ document
 
     const id = document.getElementById("editId").value;
     const name = document.getElementById("editName").value;
-    const description = document.getElementById("editDescription").value;
+    // const description = document.getElementById("editDescription").value;
+    const description = editQuill.root.innerHTML.trim();
     const searchkeywords = document.getElementById("editSearchKeywords").value;
     const imagelink = document.getElementById("editImageLink").value;
     const seotitle = document.getElementById("editSeoTitle").value;
@@ -180,10 +217,9 @@ document
   .getElementById("addForm")
   .addEventListener("submit", async function (e) {
     e.preventDefault();
+
     const name = document.getElementById("addName").value.trim();
-    const description = document
-      .getElementById("addDescription")
-      .innerHTML.trim();
+    const description = addQuill.root.innerHTML.trim();
     const searchkeywords = document
       .getElementById("addSearchKeywords")
       .value.trim();
@@ -193,33 +229,39 @@ document
     const seodescription = document
       .getElementById("addSeoDescription")
       .value.trim();
-    const publishStatus = document.querySelector(
-      'input[name="publishStatus"]:checked'
-    );
+
+    const ispublished =
+      document.querySelector('input[name="publishStatus"]:checked')?.value ===
+      "true"; // ✅ Use optional chaining and strict check
+
+    const category = {
+      name,
+      description,
+      searchkeywords,
+      imagelink,
+      seotitle,
+      seokeywords,
+      seodescription,
+      published: ispublished,
+    };
 
     await fetch(baseUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name,
-        description,
-        searchkeywords,
-        imagelink,
-        seotitle,
-        seokeywords,
-        seodescription,
-        isPublished: publishStatus,
-      }),
+      body: JSON.stringify(category),
     });
 
     closeAddModal();
     getAllCategories();
   });
 
+
 function closeEditModal() {
   document.getElementById("editModal").style.display = "none";
   document.getElementById("editForm").reset();
+  editQuill.setContents([]); // clear editor
 }
+
 async function deleteCategory(id) {
   const confirmDelete = confirm(
     "Are you sure you want to delete this category?"

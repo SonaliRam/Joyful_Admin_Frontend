@@ -161,10 +161,45 @@
           <input type="hidden" id="subcategoryId" />
 
           <div class="form-group">
-            <label><span class="required">*</span> Name:</label>
+            <label><span class="required">*</span> Subcategory Name:</label>
             <input type="text" id="name" required />
           </div>
-
+          <div class="form-group">
+            <label><span class="required">*</span> Select Categories:</label>
+            <div
+              class="custom-multi-select"
+              onclick="toggleDropdown()"
+              style="position: relative"
+            >
+              <div
+                id="selectedCategories"
+                class="selected-tags"
+                style="
+                  display: flex;
+                  flex-wrap: wrap;
+                  gap: 5px;
+                  min-height: 38px;
+                  border: 1px solid #ccc;
+                  padding: 5px;
+                  cursor: text;
+                "
+              ></div>
+              <div
+                id="dropdownList"
+                class="dropdown-list"
+                style="
+                  display: none;
+                  position: absolute;
+                  top: 100%;
+                  left: 0;
+                  width: 100%;
+                  background: white;
+                  border: 1px solid #ccc;
+                  z-index: 10;
+                "
+              ></div>
+            </div>
+          </div>
           <div class="form-group">
             <label><span class="required">*</span> Description:</label>
             <div
@@ -201,7 +236,9 @@
               "
             />
           </div>
-
+          <div class="seo-heading" style="margin-bottom: 10px;">
+            <h3>SEO:</h3>
+          </div>
           <div class="form-group">
             <label><span class="required">*</span> Meta Title:</label>
             <input type="text" id="metatitle" required />
@@ -233,43 +270,6 @@
               <input type="radio" name="ispublished" value="false" required />
               Draft
             </label>
-          </div>
-
-          <div class="form-group">
-            <label><span class="required">*</span> Select Categories:</label>
-            <div
-              class="custom-multi-select"
-              onclick="toggleDropdown()"
-              style="position: relative"
-            >
-              <div
-                id="selectedCategories"
-                class="selected-tags"
-                style="
-                  display: flex;
-                  flex-wrap: wrap;
-                  gap: 5px;
-                  min-height: 38px;
-                  border: 1px solid #ccc;
-                  padding: 5px;
-                  cursor: text;
-                "
-              ></div>
-              <div
-                id="dropdownList"
-                class="dropdown-list"
-                style="
-                  display: none;
-                  position: absolute;
-                  top: 100%;
-                  left: 0;
-                  width: 100%;
-                  background: white;
-                  border: 1px solid #ccc;
-                  z-index: 10;
-                "
-              ></div>
-            </div>
           </div>
 
           <div class="form-buttons">
