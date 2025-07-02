@@ -144,6 +144,8 @@ function selectCategory(id, name) {
         <span style="margin-left: 6px; cursor: pointer;" onclick="removeCategory(${id})">❌</span>
       `;
   document.getElementById("selectedCategories").appendChild(tag);
+  document.querySelector(".custom-multi-select").style.border =
+    "1px solid #ccc"; // reset error border
 }
 
 function removeCategory(id) {
@@ -183,6 +185,13 @@ document
     const id = document.getElementById("subcategoryId").value;
     const description = descriptionQuill.root.innerHTML.trim();
 
+    // ✅ Ensure at least one category is selected
+    if (selectedCategoryIds.length === 0) {
+      alert("Please select at least one category.");
+      document.querySelector(".custom-multi-select").style.border =
+        "1px solid red";
+      return;
+    }
     const subcategory = {
       name: document.getElementById("name").value,
       description,
