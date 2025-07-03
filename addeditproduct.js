@@ -41,68 +41,6 @@ function previewMainImage() {
   img.style.display = url ? "block" : "none";
 }
 
-function addVariantRow() {
-  const container = document.getElementById("variantsContainer");
-  const div = document.createElement("div");
-  div.classList.add("variantRow");
-  div.innerHTML = `
-    <select required>
-      <option value="">Select Option Name</option>
-      <option value="Color">Color</option>
-      <option value="Size">Size</option>
-      <option value="Capacity">Capacity</option>
-    </select>
-    <input type="text" placeholder="Enter option values comma-separated" required />
-  `;
-  container.appendChild(div);
-}
-
-
-function toggleColorImageSection() {
-  const container = document.getElementById("colorImageContainer");
-  container.style.display = "block";
-  addColorImageRow();
-}
-
-function addColorImageRow() {
-  const container = document.getElementById("colorImageContainer");
-  const row = document.createElement("div");
-  row.className = "colorImageRow";
-  row.style.cssText =
-    "display: flex; align-items: center; gap: 10px; margin-bottom: 10px;";
-
-  const colorInputId = `colorInput-${Date.now()}`;
-
-  row.innerHTML = `
-    <div style="display: flex; align-items: center; gap: 6px; width: 100px;">
-      <input type="color" id="${colorInputId}" value="#000000" required
-        style="
-          width: 100%;
-          height: 40px;
-          border: none;
-          padding: 0;
-          appearance: none;
-          cursor: pointer;
-          border-radius: 6px;
-        "
-      />
-      <span id="${colorInputId}-code" style="font-size: 14px;">#000000</span>
-    </div>
-    <input type="url" placeholder="Paste image URL" required class="input-field" style="flex: 1;" />
-  `;
-
-  container.appendChild(row);
-
-  const colorInput = document.getElementById(colorInputId);
-  const colorCode = document.getElementById(`${colorInputId}-code`);
-
-  // Update the code when color changes
-  colorInput.addEventListener("input", () => {
-    colorCode.textContent = colorInput.value;
-  });
-}
-
-
 function toggleSubcategoryDropdown() {
   if (selectedCategoryIds.length === 0) {
     document.getElementById("subcategoryWarning").style.display = "block";
@@ -245,7 +183,6 @@ function resetCategorySelector() {
   document.getElementById("selectedCategories").innerHTML = "";
 }
 
-
 async function handleAddProductSubmit(e) {
   e.preventDefault();
   if (selectedSubcategoryIds.length === 0) {
@@ -254,23 +191,6 @@ async function handleAddProductSubmit(e) {
     alert("Please select at least one subcategory.");
     return;
   }
-
-  const variantsMap = {};
-  document.querySelectorAll("#variantsContainer .variantRow").forEach((row) => {
-    const key = row.querySelector("select").value;
-    const value = row.querySelector("input").value;
-    if (key && value) variantsMap[key] = value;
-  });
-
-  const colorImages = Object.fromEntries(
-    Array.from(
-      document.querySelectorAll("#colorImageContainer .colorImageRow")
-    ).map((row) => {
-      const color = row.querySelectorAll("input")[0].value;
-      const url = row.querySelectorAll("input")[1].value;
-      return [color, url];
-    })
-  );
 
   const tags = document
     .getElementById("productTags")
@@ -282,7 +202,6 @@ async function handleAddProductSubmit(e) {
   const product = {
     name: document.getElementById("productName").value,
     description: quill.root.innerHTML,
-    size: document.getElementById("productSize").value,
     mainimage: document.getElementById("mainImage").value,
     filter: document.getElementById("productFilter").value,
     producttags: tags,
@@ -292,9 +211,6 @@ async function handleAddProductSubmit(e) {
     ispublished:
       document.querySelector('input[name="ispublished"]:checked')?.value ===
       "true",
-    variation: Object.keys(variantsMap).length > 0 ? "true" : "false",
-    variantsMap,
-    colorimages: colorImages,
     subcategories: selectedSubcategoryIds.map((id) => ({ id })),
   };
 
@@ -314,7 +230,6 @@ async function loadProductForEdit(id) {
     const product = await res.json();
 
     document.getElementById("productName").value = product.name;
-    document.getElementById("productSize").value = product.size;
     document.getElementById("mainImage").value = product.mainimage;
     previewMainImage();
     document.getElementById("productFilter").value = product.filter || "";
@@ -330,7 +245,6 @@ async function loadProductForEdit(id) {
 
     quill.root.innerHTML = product.description || "";
 
-  
     resetSubcategorySelector();
     resetCategorySelector();
 
@@ -348,52 +262,6 @@ async function loadProductForEdit(id) {
         });
       }
     });
-
-    document.getElementById("variantsContainer").innerHTML = "";
-    if (product.variation === "true" && product.variantsMap) {
-      for (const [key, value] of Object.entries(product.variantsMap)) {
-        const div = document.createElement("div");
-        div.classList.add("variantRow");
-        div.innerHTML = `
-          <select required>
-            <option value="">Select Option Name</option>
-            <option value="Color" ${
-              key === "Color" ? "selected" : ""
-            }>Color</option>
-            <option value="Size" ${
-              key === "Size" ? "selected" : ""
-            }>Size</option>
-            <option value="Capacity" ${
-              key === "Capacity" ? "selected" : ""
-            }>Capacity</option>
-          </select>
-          <input type="text" value="${value}" required />
-        `;
-        document.getElementById("variantsContainer").appendChild(div);
-      }
-    }
-
-    document.getElementById("colorImageContainer").innerHTML = "";
-    if (product.colorimages) {
-      document.getElementById("colorImageContainer").style.display = "block";
-      Object.entries(product.colorimages).forEach(([color, url]) => {
-        const row = document.createElement("div");
-        row.className = "colorImageRow";
-        const colorInputId = `colorInput-${Date.now()}`;
-        row.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <input type="color" id="${colorInputId}" value="${color}" required style="width: 30px;" />
-            <span id="${colorInputId}-code" style="font-size: 14px;">${color}</span>
-          </div>
-          <input type="url" value="${url}" required class="input-field" style="flex: 1;" />
-        `;
-        document.getElementById("colorImageContainer").appendChild(row);
-        document.getElementById(colorInputId).addEventListener("input", (e) => {
-          document.getElementById(`${colorInputId}-code`).textContent =
-            e.target.value;
-        });
-      });
-    }
   } catch (err) {
     console.error("Error loading product for edit:", err);
   }
