@@ -185,6 +185,8 @@ function resetCategorySelector() {
 
 async function handleAddProductSubmit(e) {
   e.preventDefault();
+
+  // ✅ Validate subcategory selection
   if (selectedSubcategoryIds.length === 0) {
     const selectBox = document.querySelector(".subcategory-multi-select");
     selectBox.style.border = "2px solid red";
@@ -192,6 +194,7 @@ async function handleAddProductSubmit(e) {
     return;
   }
 
+  // ✅ Parse tags
   const tags = document
     .getElementById("productTags")
     .value.trim()
@@ -199,6 +202,86 @@ async function handleAddProductSubmit(e) {
     .map((t) => t.trim())
     .filter(Boolean);
 
+  // ✅ Prepare variantsMap
+  const variantsMap = {
+    Size: [],
+    Color: [],
+    Capacity: [],
+  };
+
+  let hasDuplicate = false;
+
+  const blocks = document.querySelectorAll(".variant-block");
+  blocks.forEach((block) => {
+    const type = block.getAttribute("data-type");
+
+    if (type === "Size") {
+      const value = block.querySelector(".variant-size").value.trim();
+      const image = block.querySelector(".variant-image").value.trim();
+
+      if (!value) {
+        alert("Size value is required.");
+        hasDuplicate = true;
+        return;
+      }
+
+      const isDuplicate = variantsMap.Size.some(
+        (item) => item.value === value && item.image === image
+      );
+      if (isDuplicate) {
+        alert(`Duplicate Size entry: ${value}`);
+        hasDuplicate = true;
+        return;
+      }
+
+      variantsMap.Size.push({ value, image });
+    } else if (type === "Color") {
+      const hex = block.querySelector(".variant-color-hex").value.trim();
+      const name = block.querySelector(".variant-color-name").value.trim();
+      const image = block.querySelector(".variant-image").value.trim();
+
+      if (!hex || !name || !image) {
+        alert("Color hex, name, and image are all required.");
+        hasDuplicate = true;
+        return;
+      }
+
+      const isDuplicate = variantsMap.Color.some(
+        (item) => item.hex === hex && item.name === name && item.image === image
+      );
+      if (isDuplicate) {
+        alert(`Duplicate Color entry: ${name} (${hex})`);
+        hasDuplicate = true;
+        return;
+      }
+
+      variantsMap.Color.push({ hex, name, image });
+    } else if (type === "Capacity") {
+      const value = block.querySelector(".variant-capacity").value.trim();
+      const image = block.querySelector(".variant-image").value.trim();
+
+      if (!value) {
+        alert("Capacity value is required.");
+        hasDuplicate = true;
+        return;
+      }
+
+      const isDuplicate = variantsMap.Capacity.some(
+        (item) => item.value === value && item.image === image
+      );
+      if (isDuplicate) {
+        alert(`Duplicate Capacity entry: ${value}`);
+        hasDuplicate = true;
+        return;
+      }
+
+      variantsMap.Capacity.push({ value, image });
+    }
+  });
+
+  if (hasDuplicate) return;
+
+  // ✅ Build final product object
   const product = {
     name: document.getElementById("productName").value,
     description: quill.root.innerHTML,
@@ -212,15 +295,22 @@ async function handleAddProductSubmit(e) {
       document.querySelector('input[name="ispublished"]:checked')?.value ===
       "true",
     subcategories: selectedSubcategoryIds.map((id) => ({ id })),
+    variantsMap: variantsMap, // send as real object
   };
 
+  // ✅ Submit to backend (POST or PUT)
   const id = new URLSearchParams(window.location.search).get("id");
-  await fetch(`${baseUrl}${id ? "/" + id : ""}`, {
+  const response = await fetch(`${baseUrl}${id ? "/" + id : ""}`, {
     method: id ? "PUT" : "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(product),
   });
 
+  if (!response.ok) {
+    const errorText = await response.text();
+    alert("Failed to save product: " + errorText);
+    return;
+  }
   window.location.href = "product.html";
 }
 
@@ -262,7 +352,158 @@ async function loadProductForEdit(id) {
         });
       }
     });
+    // ✅ Prefill variantsMap (Size, Color, Capacity)
+    if (product.variantsMap) {
+      let vm = {};
+      try {
+        vm =
+          typeof product.variantsMap === "string"
+            ? JSON.parse(product.variantsMap)
+            : product.variantsMap;
+      } catch (err) {
+        console.error("Invalid variantsMap JSON", err);
+      }
+
+      // Reuse existing addVariantField logic
+      if (vm.Size && Array.isArray(vm.Size)) {
+        vm.Size.forEach((entry) => {
+          const variantId = `variant-${variantIndex++}`;
+          const html = `
+        <div class="variant-block" data-type="Size" id="${variantId}" style="display:flex; align-items:center; gap:10px; margin-bottom:10px; border:1px solid #ccc; padding:10px; border-radius:6px;">
+          <strong style="min-width:60px;">Size</strong>
+          <input type="text" placeholder="Enter size" class="variant-size" value="${
+            entry.value || ""
+          }" required style="flex:1;" />
+          <input type="url" placeholder="Image URL (optional)" class="variant-image" value="${
+            entry.image || ""
+          }" style="flex:2;" />
+          <button type="button" onclick="removeVariant('${variantId}')" title="Remove">❌</button>
+        </div>
+      `;
+          document
+            .getElementById("variantFieldsContainer")
+            .insertAdjacentHTML("beforeend", html);
+        });
+      }
+
+      if (vm.Color && Array.isArray(vm.Color)) {
+        vm.Color.forEach((entry) => {
+          const variantId = `variant-${variantIndex++}`;
+          const html = `
+        <div class="variant-block" data-type="Color" id="${variantId}" style="display:flex; align-items:center; gap:10px; margin-bottom:10px; border:1px solid #ccc; padding:10px; border-radius:6px;">
+          <strong style="min-width:60px;">Color</strong>
+          <input type="color" class="variant-color-hex" value="${
+            entry.hex || "#000000"
+          }" required style="width:40px; height:40px; border:none; cursor:pointer;" onchange="updateHexDisplay(this, '${variantId}')" />
+          <span id="${variantId}-hex-code" style="width:80px;">${
+            entry.hex || "#000000"
+          }</span>
+          <input type="text" placeholder="Color Name" class="variant-color-name" value="${
+            entry.name || ""
+          }" required style="flex:1;" />
+          <input type="url" placeholder="Image URL (required)" class="variant-image" value="${
+            entry.image || ""
+          }" required style="flex:2;" />
+          <button type="button" onclick="removeVariant('${variantId}')" title="Remove">❌</button>
+        </div>
+      `;
+          document
+            .getElementById("variantFieldsContainer")
+            .insertAdjacentHTML("beforeend", html);
+        });
+      }
+
+      if (vm.Capacity && Array.isArray(vm.Capacity)) {
+        vm.Capacity.forEach((entry) => {
+          const variantId = `variant-${variantIndex++}`;
+          const html = `
+        <div class="variant-block" data-type="Capacity" id="${variantId}" style="display:flex; align-items:center; gap:10px; margin-bottom:10px; border:1px solid #ccc; padding:10px; border-radius:6px;">
+          <strong style="min-width:80px;">Capacity</strong>
+          <input type="text" placeholder="Enter capacity" class="variant-capacity" value="${
+            entry.value || ""
+          }" required style="flex:1;" />
+          <input type="url" placeholder="Image URL (optional)" class="variant-image" value="${
+            entry.image || ""
+          }" style="flex:2;" />
+          <button type="button" onclick="removeVariant('${variantId}')" title="Remove">❌</button>
+        </div>
+      `;
+          document
+            .getElementById("variantFieldsContainer")
+            .insertAdjacentHTML("beforeend", html);
+        });
+      }
+    }
   } catch (err) {
     console.error("Error loading product for edit:", err);
   }
+}
+
+// ! variant
+function showVariantTypeDropdown() {
+  const dropdown = document.getElementById("variantTypeDropdown");
+  dropdown.style.display =
+    dropdown.style.display === "block" ? "none" : "block";
+}
+
+// Close dropdown if clicked outside
+document.addEventListener("click", (e) => {
+  const dropdown = document.getElementById("variantTypeDropdown");
+  const button = document.querySelector(
+    "button[onclick='showVariantTypeDropdown()']"
+  );
+  if (!dropdown.contains(e.target) && e.target !== button) {
+    dropdown.style.display = "none";
+  }
+});
+let variantIndex = 0;
+
+function addVariantField(type) {
+  const container = document.getElementById("variantFieldsContainer");
+  const variantId = `variant-${variantIndex++}`;
+
+  let html = "";
+
+  if (type === "Size") {
+    html = `
+      <div class="variant-block" data-type="Size" id="${variantId}" style="display:flex; align-items:center; gap:10px; margin-bottom:10px; border:1px solid #ccc; padding:10px; border-radius:6px;">
+        <strong style="min-width:60px;">Size</strong>
+        <input type="text" placeholder="Enter size" class="variant-size" required style="flex:1;" />
+        <input type="url" placeholder="Image URL (optional)" class="variant-image" style="flex:2;" />
+        <button type="button" onclick="removeVariant('${variantId}')" title="Remove">❌</button>
+      </div>
+    `;
+  } else if (type === "Color") {
+    html = `
+      <div class="variant-block" data-type="Color" id="${variantId}" style="display:flex; align-items:center; gap:10px; margin-bottom:10px; border:1px solid #ccc; padding:10px; border-radius:6px;">
+        <strong style="min-width:60px;">Color</strong>
+        <input type="color" class="variant-color-hex" required style="width:40px; height:40px; border:none; cursor:pointer;" onchange="updateHexDisplay(this, '${variantId}')" />
+        <span id="${variantId}-hex-code" style="width:80px;">#000000</span>
+        <input type="text" placeholder="Color Name" class="variant-color-name" required style="flex:1;" />
+        <input type="url" placeholder="Image URL (required)" class="variant-image" required style="flex:2;" />
+        <button type="button" onclick="removeVariant('${variantId}')" title="Remove">❌</button>
+      </div>
+    `;
+  } else if (type === "Capacity") {
+    html = `
+      <div class="variant-block" data-type="Capacity" id="${variantId}" style="display:flex; align-items:center; gap:10px; margin-bottom:10px; border:1px solid #ccc; padding:10px; border-radius:6px;">
+        <strong style="min-width:80px;">Capacity</strong>
+        <input type="text" placeholder="Enter capacity" class="variant-capacity" required style="flex:1;" />
+        <input type="url" placeholder="Image URL (optional)" class="variant-image" style="flex:2;" />
+        <button type="button" onclick="removeVariant('${variantId}')" title="Remove">❌</button>
+      </div>
+    `;
+  }
+
+  container.insertAdjacentHTML("beforeend", html);
+  document.getElementById("variantTypeDropdown").style.display = "none";
+}
+
+function removeVariant(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+function updateHexDisplay(input, id) {
+  document.getElementById(`${id}-hex-code`).textContent = input.value;
 }
