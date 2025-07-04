@@ -118,7 +118,6 @@ function openAddModal() {
   document.getElementById("addModal").style.display = "flex";
 }
 
-
 function closeAddModal() {
   document.getElementById("addModal").style.display = "none";
   document.getElementById("addForm").reset();
@@ -255,18 +254,50 @@ document
     getAllCategories();
   });
 
-
 function closeEditModal() {
   document.getElementById("editModal").style.display = "none";
   document.getElementById("editForm").reset();
   editQuill.setContents([]); // clear editor
 }
 
+
 async function deleteCategory(id) {
   const confirmDelete = confirm(
     "Are you sure you want to delete this category?"
   );
   if (!confirmDelete) return;
-  await fetch(`${baseUrl}/${id}`, { method: "DELETE" });
-  getAllCategories();
+
+  try {
+    const res = await fetch(`${baseUrl}/${id}`, { method: "DELETE" });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      if (
+        res.status === 400 ||
+        res.status === 409 // Use appropriate status code
+      ) {
+        showCustomAlert(
+          errorData.message ||
+            "This category has subcategories and cannot be deleted."
+        );
+      } else {
+        showCustomAlert("An unexpected error occurred. Please try again.");
+      }
+      return;
+    }
+
+    getAllCategories();
+  } catch (err) {
+    console.error("Delete error:", err);
+    showCustomAlert("Failed to connect to the server.");
+  }
+}
+
+function showCustomAlert(message) {
+  document.getElementById("customAlertMessage").textContent = message;
+  document.getElementById("customAlert").style.display = "flex";
+}
+
+function closeCustomAlert() {
+  document.getElementById("customAlert").style.display = "none";
 }

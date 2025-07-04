@@ -247,9 +247,37 @@ function handleEditClick(id) {
   if (!sub) return alert("Subcategory not found");
   editSubcategory(sub);
 }
+function showCustomAlert(message) {
+  document.getElementById("customAlertMessage").textContent = message;
+  document.getElementById("customAlert").style.display = "flex";
+}
+
+function closeCustomAlert() {
+  document.getElementById("customAlert").style.display = "none";
+}
 
 async function deleteSubcategory(id) {
   if (!confirm("Are you sure you want to delete this subcategory?")) return;
-  await fetch(`${baseUrl}/${id}`, { method: "DELETE" });
-  getAllSubcategories();
+
+  try {
+    const res = await fetch(`${baseUrl}/${id}`, { method: "DELETE" });
+
+    if (!res.ok) {
+      const errorData = await res.json();
+      if (res.status === 409) {
+        showCustomAlert(
+          errorData.message ||
+            "Subcategory is linked to products and cannot be deleted."
+        );
+      } else {
+        showCustomAlert("Unexpected error occurred. Please try again.");
+      }
+      return;
+    }
+
+    getAllSubcategories();
+  } catch (err) {
+    console.error("Delete failed:", err);
+    showCustomAlert("Failed to connect to the server.");
+  }
 }
