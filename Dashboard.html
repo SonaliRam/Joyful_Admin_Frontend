@@ -1,113 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Font Awesome CDN -->
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
-    />
 
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="global.css" />
-    <link rel="stylesheet" href="Dashboard.css" />
-  </head>
-  <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-      <div class="nav-container">
-        <a href="Dashboard.html" class="logo">AdminPanel</a>
-        <ul class="nav-menu">
-          <li class="nav-item"><a href="Category.html">Category</a></li>
-          <li class="nav-item"><a href="subcategory.html">Sub-Category</a></li>
-          <li class="nav-item"><a href="product.html">Products</a></li>
-          <li class="nav-item">
-            <a href="productenquiry.html">Product Enquiry</a>
-          </li>
-          <li class="nav-item">
-            <button class="logout" onclick="logout()">Logout</button>
-          </li>
-        </ul>
-      </div>
-    </nav>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Font Awesome CDN -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 
-    <!-- Dashboard Content -->
-    <div class="dashboard-container">
-      <div class="dashboard-header">
-        <h1>Welcome to the Admin Dashboard</h1>
-        <p>
-          Manage your categories, sub-categories, products, and enquiries
-          efficiently.
-        </p>
-      </div>
+  <title>Admin Dashboard</title>
+  <link rel="stylesheet" href="global.css" />
+  <link rel="stylesheet" href="Dashboard.css" />
+</head>
 
-      <div class="dashboard-grid">
-        <!-- Category Card -->
-        <a href="Category.html" class="dashboard-card">
-          <div class="card-header">
-            <div class="card-icon categories">
-              <i class="fas fa-folder"></i>
-            </div>
-          </div>
-          <div class="card-stats">
-            <div class="stat-label">Categories</div>
-          </div>
-          <div class="stat-number" id="categoryCount"></div>
-          <div class="card-action">View Categories →</div>
-        </a>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="Dashboard.html" class="logo">AdminPanel</a>
+      <ul class="nav-menu">
+        <li class="nav-item"><a href="Category.html">Category</a></li>
+        <li class="nav-item"><a href="subcategory.html">Sub-Category</a></li>
+        <li class="nav-item"><a href="product.html">Products</a></li>
+        <li class="nav-item">
+          <a href="productenquiry.html">Product Enquiry</a>
+        </li>
+        <li class="nav-item">
+          <button class="logout" onclick="logout()">Logout</button>
+        </li>
+      </ul>
+    </div>
+  </nav>
 
-        <!-- Sub-Category Card -->
-        <a href="subcategory.html" class="dashboard-card">
-          <div class="card-header">
-            <div class="card-icon categories">
-              <i class="fas fa-tags"></i>
-            </div>
-          </div>
-          <div class="stat-label">Sub-Categories</div>
-          <div class="card-stats">
-            <div class="stat-number" id="subcategoryCount">0</div>
-          </div>
-          <div class="card-action">View Sub-Categories →</div>
-        </a>
-
-        <!-- Product Card -->
-        <a href="product.html" class="dashboard-card">
-          <div class="card-header">
-            <div class="card-icon categories">
-              <i class="fas fa-box-open"></i>
-            </div>
-          </div>
-          <div class="stat-label">Products</div>
-          <div class="card-stats">
-            <div class="stat-number" id="productCount">0</div>
-          </div>
-          <div class="card-action">View Products →</div>
-        </a>
-
-        <!-- Enquiry Card -->
-        <a href="./productenquiry.html" class="dashboard-card">
-          <div class="card-header">
-            <div class="card-icon categories">
-            <i class="fas fa-boxes-stacked"></i>
-            </div>
-          </div>
-          <div class="stat-label">Enquiries</div>
-          <div class="card-stats">
-            <div class="stat-number" id="enquiryCount">0</div>
-          </div>
-          <div class="card-action">View Enqury →</div>
-        </a>
-      </div>
+  <!-- Dashboard Content -->
+  <div class="dashboard-container">
+    <div class="dashboard-header">
+      <h1>Welcome to the Admin Dashboard</h1>
+      <p>
+        Manage your categories, sub-categories, products, and enquiries
+        efficiently.
+      </p>
     </div>
 
-    <!-- JS Dependencies -->
-    <script
-      src="https://kit.fontawesome.com/a076d05399.js"
-      crossorigin="anonymous"
-    ></script>
-    <script src="./Logout.js"></script>
-    <script src="global.js"></script>
+    <div class="dashboard-grid">
+      <!-- Category Card -->
+      <a href="Category.html" class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon categories">
+            <i class="fas fa-folder"></i>
+          </div>
+        </div>
+        <div class="card-stats">
+          <div class="stat-label">Categories</div>
+        </div>
+        <div class="stat-number" id="categoryCount"></div>
+        <div class="card-action">View Categories →</div>
+      </a>
 
-  </body>
+      <!-- Sub-Category Card -->
+      <a href="subcategory.html" class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon categories">
+            <i class="fas fa-tags"></i>
+          </div>
+        </div>
+        <div class="stat-label">Sub-Categories</div>
+        <div class="card-stats">
+          <div class="stat-number" id="subcategoryCount">0</div>
+        </div>
+        <div class="card-action">View Sub-Categories →</div>
+      </a>
+
+      <!-- Product Card -->
+      <a href="product.html" class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon categories">
+            <i class="fas fa-box-open"></i>
+          </div>
+        </div>
+        <div class="stat-label">Products</div>
+        <div class="card-stats">
+          <div class="stat-number" id="productCount">0</div>
+        </div>
+        <div class="card-action">View Products →</div>
+      </a>
+
+      <!-- Enquiry Card -->
+      <a href="./productenquiry.html" class="dashboard-card">
+        <div class="card-header">
+          <div class="card-icon categories">
+            <i class="fas fa-boxes-stacked"></i>
+          </div>
+        </div>
+        <div class="stat-label">Enquiries</div>
+        <div class="card-stats">
+          <div class="stat-number" id="enquiryCount">0</div>
+        </div>
+        <div class="card-action">View Enqury →</div>
+      </a>
+    </div>
+  </div>
+  <div>
+    <a href="csvupload.html">click here</a>
+  </div>
+  <!-- JS Dependencies -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="./Logout.js"></script>
+  <script src="global.js"></script>
+
+</body>
+
 </html>

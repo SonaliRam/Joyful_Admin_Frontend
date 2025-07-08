@@ -295,7 +295,8 @@ async function handleAddProductSubmit(e) {
       document.querySelector('input[name="ispublished"]:checked')?.value ===
       "true",
     subcategories: selectedSubcategoryIds.map((id) => ({ id })),
-    variantsMap: variantsMap, // send as real object
+    // variantsMap: variantsMap, // send as real object
+     variantsMap: JSON.stringify(variantsMap),
   };
 
   // ✅ Submit to backend (POST or PUT)
