@@ -3,11 +3,33 @@ const categoryMap = new Map(); // Stores id -> category object
 let addQuill;
 let editQuill;
 
+// function previewImage() {
+//   const imageUrl = document.getElementById("addImageLink").value;
+//   const preview = document.getElementById("imagePreview");
+//   preview.style.display = imageUrl.trim() ? "block" : "none";
+//   preview.src = imageUrl.trim();
+// }
 function previewImage() {
-  const imageUrl = document.getElementById("addImageLink").value;
+  const input = document.getElementById("addImageLink");
   const preview = document.getElementById("imagePreview");
-  preview.style.display = imageUrl.trim() ? "block" : "none";
-  preview.src = imageUrl.trim();
+
+  let imageUrl = input.value.trim();
+  let finalUrl = imageUrl;
+
+  // Convert Google Drive link to direct viewable URL
+  const driveMatch = imageUrl.match(
+    /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/
+  );
+  if (driveMatch && driveMatch[1]) {
+    const fileId = driveMatch[1];
+    finalUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+
+    // ✅ Update the input value so the correct link gets saved
+    input.value = finalUrl;
+  }
+
+  preview.src = finalUrl;
+  preview.style.display = finalUrl ? "block" : "none";
 }
 
 // window.onload = getAllCategories;
@@ -259,7 +281,6 @@ function closeEditModal() {
   document.getElementById("editForm").reset();
   editQuill.setContents([]); // clear editor
 }
-
 
 async function deleteCategory(id) {
   const confirmDelete = confirm(
