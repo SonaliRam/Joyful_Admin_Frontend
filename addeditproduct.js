@@ -298,6 +298,7 @@ async function handleAddProductSubmit(e) {
     metatitle: document.getElementById("metaTitle").value,
     metadescription: document.getElementById("metaDescription").value,
     pagekeywords: document.getElementById("pageKeywords").value,
+    newarrival: document.getElementById("newArrivalCheckbox").checked,
     ispublished:
       document.querySelector('input[name="ispublished"]:checked')?.value ===
       "true",
@@ -336,6 +337,8 @@ async function loadProductForEdit(id) {
       product.producttags || []
     ).join(", ");
     document.getElementById("metaTitle").value = product.metatitle;
+    document.getElementById("newArrivalCheckbox").checked =
+      !!product.newarrival;
     document.getElementById("metaDescription").value = product.metadescription;
     document.getElementById("pageKeywords").value = product.pagekeywords;
     document.querySelector(
@@ -401,10 +404,14 @@ async function loadProductForEdit(id) {
           const html = `
         <div class="variant-block" data-type="Color" id="${variantId}" style="display:flex; align-items:center; gap:10px; margin-bottom:10px; border:1px solid #ccc; padding:10px; border-radius:6px;">
           <strong style="min-width:60px;">Color</strong>
-         <input type="color" class="variant-color-hex" id="${variantId}-color" value="${entry.hex || "#000000"}"
+         <input type="color" class="variant-color-hex" id="${variantId}-color" value="${
+            entry.hex || "#000000"
+          }"
   required style="width:40px; height:40px; border:none; cursor:pointer;"
   onchange="updateHexInput(this, '${variantId}')" />
-<input type="text" id="${variantId}-hex-code" class="variant-hex-input" value="${entry.hex || "#000000"}"
+<input type="text" id="${variantId}-hex-code" class="variant-hex-input" value="${
+            entry.hex || "#000000"
+          }"
   style="width:80px;" maxlength="7"
   oninput="updateColorPicker(this, '${variantId}')" />
 
