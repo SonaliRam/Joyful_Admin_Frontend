@@ -33,16 +33,21 @@
   </nav>
   <div class="csvuploader">
     <div class="upload-btn">
-      <label for="csvInput" class="file-label">📁 Choose CSV File</label>
+      <label for="csvInput" class="file-label"> Choose CSV File</label>
       <input type="file" id="csvInput" accept=".csv" />
 
       <div class="button-group">
 
-        <button onclick="submitBulkData()">🚀 Submit All</button>
+        <button
+          onclick="if(!document.getElementById('csvInput').files.length) { alert('Please select a file first'); return false; } submitBulkData()">
+           Submit All
+        </button>
       </div>
     </div>
   </div>
-
+  <!-- ⬇️ Add this below the button group -->
+  <div id="uploadStatus" style="margin-top: 10px; font-weight: bold; color: #444;"></div>
+  </div>
   <div class="show-table">
     <table id="previewTable" class="preview-table"></table>
   </div>
